@@ -20,13 +20,12 @@ const totalWordElement = document.getElementById('total-word');
 const wordsProgressElement = document.getElementById('words-progress');
 const correctPercentElement = document.getElementById('correct-percent');
 const examProgressElement = document.getElementById('exam-progress');
-const timerElement = document.getElementById('timer');
+const timerElement = document.getElementById('time');
 const resultsModal = document.querySelector('.results-modal');
 const resultsContent = document.querySelector('.results-content');
 const wordStatsTemplate = document.getElementById('word-stats');
 
 document.addEventListener('DOMContentLoaded', () => {
-    loadProgress();
     updateCard();
     totalWordElement.textContent = words.length;
 
@@ -46,6 +45,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('exam').addEventListener('click', startExam);
     document.getElementById('shuffle-words').addEventListener('click', shuffleWords);
+
+    document.querySelector('.flip-card').addEventListener('click', () => {
+        document.querySelector('.flip-card-inner').classList.toggle('active');
+    });
 });
 
 function updateCard() {
@@ -60,18 +63,8 @@ function updateCard() {
     currentWordElement.textContent = currentIndex + 1;
     wordsProgressElement.value = ((currentIndex + 1) / words.length) * 100;
 
-    const backButton = document.getElementById('back');
-    const nextButton = document.getElementById('next');
-
-    backButton.disabled = currentIndex === 0;
-    nextButton.disabled = currentIndex === words.length - 1;
-
-    // Переворот карточки
-    const flipCard = document.querySelector('.flip-card');
-    flipCard.classList.remove('active');
-    flipCard.addEventListener('click', () => {
-        flipCard.classList.toggle('active');
-    });
+    document.getElementById('back').disabled = currentIndex === 0;
+    document.getElementById('next').disabled = currentIndex === words.length - 1;
 }
 
 function startExam() {
@@ -173,23 +166,3 @@ function shuffleWords() {
     currentIndex = 0;
     updateCard();
 }
-
-function loadProgress() {
-    const savedIndex = localStorage.getItem('currentIndex');
-    if (savedIndex) {
-        currentIndex = parseInt(savedIndex);
-    }
-    const savedWords = JSON.parse(localStorage.getItem('shuffledWords'));
-    if (savedWords) {
-        words.splice(0, words.length, ...savedWords);
-    }
-    updateCard();
-}
-
-window.addEventListener('beforeunload', () => {
-    localStorage.setItem('currentIndex', currentIndex);
-    localStorage.setItem('shuffledWords', JSON.stringify(words));
-    localStorage.setItem('correctAnswers', correctAnswers);
-    localStorage.setItem('wrongAnswers', wrongAnswers);
-    localStorage.setItem('elapsedTime', Math.floor((Date.now() - startTime) / 1000));
-});
